@@ -32,11 +32,17 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Install FFmpeg and bold font
+      - name: Install FFmpeg
+        timeout-minutes: 5
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
-          ffmpeg -version | head -n 1
+          # Static FFmpeg build downloaded from GitHub (fast and reliable;
+          # Ubuntu's apt servers can hang for 20+ minutes on runners).
+          curl -sSfL --retry 3 -o /tmp/ffmpeg.tar.xz \
+            https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz
+          mkdir -p /tmp/ffmpeg
+          tar -xJf /tmp/ffmpeg.tar.xz -C /tmp/ffmpeg --strip-components=1
+          echo "/tmp/ffmpeg/bin" >> "$GITHUB_PATH"
+          /tmp/ffmpeg/bin/ffmpeg -version | head -n 1
 
       - name: Install Python packages
         run: pip install -r requirements.txt
