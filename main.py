@@ -645,6 +645,12 @@ def main():
     history.append(record)
     save_history(history)
 
+    summary_path = os.getenv("GITHUB_STEP_SUMMARY")
+    if summary_path:
+        with open(summary_path, "a", encoding="utf-8") as fh:
+            fh.write(f"## ✅ Video made\n\n**Quote:** {package['quote']}\n\n**Caption:** {package['caption']}\n\n"
+                     f"**Hashtags:** {' '.join(package['hashtags'])}\n\nDownload it under **Artifacts** below.\n")
+
     tiktok_ready = all(os.getenv(k) for k in ("TIKTOK_CLIENT_KEY", "TIKTOK_CLIENT_SECRET", "TIKTOK_REFRESH_TOKEN"))
     if not tiktok_ready:
         log("TikTok secrets not set — video rendered and saved as a workflow artifact only.")
@@ -659,5 +665,12 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as exc:  # fail the GitHub Action so you get an email
-        log(f"FAILED: {exc}")
+        message = f"{type(exc).__name__}: {exc}"
+        log(f"FAILED: {message}")
+        # Shows as a red error box on the run page (readable from a phone).
+        print(f"::error title=HEM pipeline failed::{message.replace(chr(10), ' ')[:900]}", flush=True)
+        summary_path = os.getenv("GITHUB_STEP_SUMMARY")
+        if summary_path:
+            with open(summary_path, "a", encoding="utf-8") as fh:
+                fh.write(f"## ❌ HEM pipeline failed\n\n```\n{message[:3000]}\n```\n")
         sys.exit(1)
