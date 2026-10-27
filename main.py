@@ -629,6 +629,15 @@ def main():
     if not os.getenv("ANTHROPIC_API_KEY"):
         raise RuntimeError("ANTHROPIC_API_KEY secret is not set")
 
+    # Stop BEFORE spending Anthropic credits if TikTok isn't connected, and fail loudly
+    # (red run + email) instead of quietly making videos that never get posted.
+    missing = [k for k in ("TIKTOK_CLIENT_KEY", "TIKTOK_CLIENT_SECRET", "TIKTOK_REFRESH_TOKEN") if not os.getenv(k)]
+    if missing:
+        raise RuntimeError(
+            "TikTok is not connected yet - missing secret(s): " + ", ".join(missing) +
+            ". Nothing was generated or posted. Run the 'TikTok Auth (one-time)' workflow to connect it (see SETUP.md step 5)."
+        )
+
     history = load_history()
     package = generate_content(history)
     duration = render_video(package["quote"], package["highlight"])
@@ -651,14 +660,13 @@ def main():
             fh.write(f"## ✅ Video made\n\n**Quote:** {package['quote']}\n\n**Caption:** {package['caption']}\n\n"
                      f"**Hashtags:** {' '.join(package['hashtags'])}\n\nDownload it under **Artifacts** below.\n")
 
-    tiktok_ready = all(os.getenv(k) for k in ("TIKTOK_CLIENT_KEY", "TIKTOK_CLIENT_SECRET", "TIKTOK_REFRESH_TOKEN"))
-    if not tiktok_ready:
-        log("TikTok secrets not set — video rendered and saved as a workflow artifact only.")
-        return
-
     record["publish_id"] = post_to_tiktok(package, duration)
     record["posted"] = True
     save_history(history)
+
+    if summary_path:
+        with open(summary_path, "a", encoding="utf-8") as fh:
+            fh.write(f"\n## \U0001F4E4 Sent to TikTok ({POST_MODE} mode)\n\nPublish ID: {record['publish_id']}\n")
 
 
 if __name__ == "__main__":
