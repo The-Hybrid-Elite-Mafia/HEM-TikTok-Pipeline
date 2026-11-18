@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "HEM TikTok Poster",
+  "version": "1.0.0",
+  "description": "Hybrid Elite Mafia: loads queued HEM videos into TikTok Studio, types the caption and schedules each post.",
+  "minimum_chrome_version": "120",
+  "permissions": ["storage", "alarms", "tabs", "scripting", "debugger", "notifications"],
+  "host_permissions": [
+    "https://raw.githubusercontent.com/*",
+    "https://www.tiktok.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "HEM TikTok Poster",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "128": "icon128.png"
+  }
+}

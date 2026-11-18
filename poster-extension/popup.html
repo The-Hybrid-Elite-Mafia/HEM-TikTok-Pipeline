@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>HEM TikTok Poster</h1>
+
+  <label class="row">
+    <input type="checkbox" id="enabled">
+    <span>Turned on (checks every hour)</span>
+  </label>
+
+  <label class="row col">
+    <span>Mode</span>
+    <select id="mode">
+      <option value="review">Review — fill everything, I press Schedule</option>
+      <option value="auto">Auto — press Schedule for me</option>
+    </select>
+  </label>
+
+  <label class="row col">
+    <span>Queue address</span>
+    <input type="text" id="queueUrl" spellcheck="false">
+  </label>
+
+  <div class="buttons">
+    <button id="save">Save</button>
+    <button id="run">Run now</button>
+    <button id="reset" class="dim">Clear failed / review marks</button>
+  </div>
+
+  <h2>Queue</h2>
+  <div id="queue" class="box">Loading…</div>
+
+  <h2>Activity</h2>
+  <div id="log" class="box mono"></div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
